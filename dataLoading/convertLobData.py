@@ -1,28 +1,29 @@
 import pandas as pd
 import numpy as np
 import re
+import io
 
 #opens file
-file = open("sampleLOB.txt")
+file = io.open('sampleLOB.txt','r', encoding='utf-16-le')
+
 
 #stores data from file in array and strips whitespace
 data = [line for line in file.readlines() if re.search("[\w].*", line) != None][1:]
+file.close()
+
 
 organisedData = []
 #converts to human readable lines
 for line in data:
-    for word in line.split(" "):
-        if word != '\x00':
-            charArray = word.split("\x00")[:-1]
-            modifiedWord = ""
-            for char in charArray:
-                modifiedWord += char
-                
-            #removes speech marks and commas of time, bid and ask lines
-            if "time" in modifiedWord or "bid" in modifiedWord or "ask" in modifiedWord:
-                modifiedWord = modifiedWord[1:-2]
-            organisedData.append(modifiedWord)
+    test = list(filter(lambda match: match != '' and match != ' ' and match != '\n', re.findall("\s?[\w\.]*",line)))
+    #print(test)
+    for word in list(filter(lambda match: match != '' and match != ' ' and match != '\n', re.findall("\s?[\w\.]*",line))):   
+        #removes speech marks and commas of time, bid and ask lines
+        if not("time" in word or "bid" in word or "ask" in word):
+            word = word[1:]
+        organisedData.append(word)
 
+        
 def chunkArrayByWord(ls,chunkWord):   
     chunkedData = []
     chunk = []
@@ -57,23 +58,25 @@ for time in evenChunkierData:
             asks.append(time[2][i-1:i+1])
     organisedData.append([time[0], bids, asks])
 
+    
 # now we aim to flatten the data into tabular data which we will eventually use for the csv file
 tabularData =[]
 for time in organisedData:
     for bids in time[1]:
         tabularData.append([
-            float(time[0][:-1]), #removes comma and converts to float
+            float(time[0]),
             'bid',
-            int(bids[0][:-1]), #removes comma and converts to int
-            int(bids[1]) #converts to int
+            int(bids[0]),
+            int(bids[1])
         ])
     for asks in time[2]:
         tabularData.append([
-            float(time[0][:-1]), #removes comma and converts to float
+            float(time[0]),
             'ask',
-            int(asks[0][:-1]),#removes comma and converts to int
-            int(asks[1]) #converts to int
-        ])       
+            int(asks[0]),
+            int(asks[1])
+        ])
+        
 
 #We can save this uncompressed data as csv data
 dict = {
@@ -85,6 +88,7 @@ dict = {
        
 df = pd.DataFrame(dict)
 df.to_csv('tabularData.csv')
+
 
 #we now need to the start and end time of a bid or ask
 def createEntryWithStartAndEndTime(tabularData):
@@ -121,6 +125,7 @@ def compressDataToStartAndEndTime(tabularData):
     return np.array(compressed)
     
 compressed = compressDataToStartAndEndTime(tabularData)
+
 
 #Now we just need to save the data as a csv file
 dict = {
