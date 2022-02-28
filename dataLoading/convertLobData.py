@@ -4,7 +4,7 @@ import re
 import io
 
 #opens file
-file = io.open('sampleLOB.txt','r', encoding='utf-16-le')
+file = io.open('sampleSubset.txt','r', encoding='utf-16-le')
 
 
 #stores data from file in array and strips whitespace
@@ -78,16 +78,17 @@ for time in organisedData:
         ])
         
 
-#We can save this uncompressed data as csv data
-dict = {
-    'Time': np.array(tabularData)[:,0],
-    'Transaction': np.array(tabularData)[:,1],
-    'Value': np.array(tabularData)[:,2],
-    'Amount': np.array(tabularData)[:,3],
-}  
-       
-df = pd.DataFrame(dict)
-df.to_csv('tabularData.csv')
+if len(tabularData)>0: #its possible irrelevant data is filtered out leaving an empty list
+    # We can save this uncompressed data as csv data
+    dict = {
+        'Time': np.array(tabularData)[:,0],
+        'Transaction': np.array(tabularData)[:,1],
+        'Value': np.array(tabularData)[:,2],
+        'Amount': np.array(tabularData)[:,3],
+    }  
+
+    df = pd.DataFrame(dict)
+    df.to_csv('tabularData.csv')
 
 
 #we now need to the start and end time of a bid or ask
@@ -127,14 +128,15 @@ def compressDataToStartAndEndTime(tabularData):
 compressed = compressDataToStartAndEndTime(tabularData)
 
 
-#Now we just need to save the data as a csv file
-dict = {
-    'Start_Time': np.array(compressed)[:,0],
-    'End_Time': np.array(compressed)[:,1],
-    'Transaction': np.array(compressed)[:,2],
-    'Value': np.array(compressed)[:,3],
-    'Amount': np.array(compressed)[:,4],
-}  
-       
-df = pd.DataFrame(dict)
-df.to_csv('compressedTabularData.csv') 
+if len(tabularData)>0: #its possible irrelevant data is filtered out leaving an empty list
+    #Now we just need to save the data as a csv file
+    dict = {
+        'Start_Time': np.array(compressed)[:,0],
+        'End_Time': np.array(compressed)[:,1],
+        'Transaction': np.array(compressed)[:,2],
+        'Value': np.array(compressed)[:,3],
+        'Amount': np.array(compressed)[:,4],
+    }  
+
+    df = pd.DataFrame(dict)
+    df.to_csv('compressedTabularData.csv') 
