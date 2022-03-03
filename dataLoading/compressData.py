@@ -1,22 +1,23 @@
 import csv
 
-inputFilename = "Tst2022-04-29LOBs"
+inputFilename = "Tst2022-01-13LOBs"
 with open(inputFilename + ".csv", mode ='r')as file:
    
   # reading the CSV file
   reader = csv.reader(file)
-  #tabularData = [line for line in reader]
-  tabularData = list(map(lambda row: [int(float(row[0])/0.016), float(row[0]), row[1], int(row[2]), int(row[3])], reader))
+ 
+  tabularData = []
+  for i, row in enumerate(reader):
+      tabularData.append( [int(i), int(float(row[0])/0.016), float(row[0]), row[1], int(row[2]), int(row[3])])
+
 file.close()
-#tabularData = list(map(lambda row: [float(row[0]), row[1], int(row[2]), int(row[3])], tabularData))
 print("data loaded")
 
 
 #we now need to the start and end time of a bid or ask
 def createEntryWithStartAndEndTime(tabularData):
-    #tabularData = list(map(lambda row: [int(row[0]/0.016),row[0],row[1],row[2], row[3]], tabularData))
     initialEntryOfInterest = tabularData[0]
-    startDate = tabularData[0][1]
+    startDate = tabularData[0][2]
     endDate = -1
     print("step 1 -", len(tabularData))
     rowsOfInterest = list(filter(lambda e: e[-3:] == initialEntryOfInterest[-3:], tabularData))
@@ -24,19 +25,24 @@ def createEntryWithStartAndEndTime(tabularData):
     historyOfAnEntry = []
     
     for i, row in enumerate(rowsOfInterest):
-        print(round(i/len(rowsOfInterest),2))
-        if (i+1)==len(rowsOfInterest) or row[0] == rowsOfInterest[i+1][0]:
+        if (i+1)==len(rowsOfInterest) or row[1] == rowsOfInterest[i+1][1]:
             historyOfAnEntry = historyOfAnEntry + rowsOfInterest[:i+1]
     if len(historyOfAnEntry) != 0:
-        endDate = historyOfAnEntry[-1][1]
+        endDate = historyOfAnEntry[-1][2]
     else:
         historyOfAnEntry.append(initialEntryOfInterest)
         endDate = -1
     print("step 3")
     
-    tabularData = list(map(lambda row: row[:], filter(lambda row: row not in historyOfAnEntry, tabularData)))
-    print("step 4 -", len(tabularData), [startDate, endDate] + initialEntryOfInterest[2:])
-    return [startDate, endDate] + initialEntryOfInterest[2:], tabularData
+    indexesToDelete = list(map(lambda row: row[0], historyOfAnEntry))
+
+    for i, indexDel in enumerate(indexesToDelete):
+        tabularData.pop(indexDel - i)
+        if i % 3500 == 0:
+            print(round(i / len(indexesToDelete), 5))
+
+    print("step 4 -", len(tabularData), [startDate, endDate] + initialEntryOfInterest[3:])
+    return [startDate, endDate] + initialEntryOfInterest[3:], tabularData
 
 def compressDataToStartAndEndTime(tabularData):
     data = tabularData
@@ -49,7 +55,7 @@ def compressDataToStartAndEndTime(tabularData):
     
     return np.array(compressed)
     
-compressed = compressDataToStartAndEndTime(tabularData)
+compressed = compressDataToStartAndEndTime(tabularData) # this would take roughly 18 days to complete
 
 
 if len(tabularData)>0: #its possible irrelevant data is filtered out leaving an empty list
