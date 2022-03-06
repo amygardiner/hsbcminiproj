@@ -19,6 +19,8 @@ import matplotlib.pyplot as plt
 df1 = pd.read_csv('Tst2022-01-04tapes.csv',usecols=[2,3],nrows=250,names=['time','value'], header=0)
 df=df1.value
 
+df_test = pd.read_csv('Tst2022-01-04tapes.csv',usecols=[3],skiprows=250,nrows=4,names=['value'], header=0)
+
 # KPSS Test    
 result = kpss(df, regression='c', nlags="legacy")
 print('\nKPSS Statistic: %f' % result[0])
@@ -90,11 +92,22 @@ plt.show()
 arima_pred=arima_mod.predict(dynamic=False)
 arima_pred.pop(0)
 
+forecast = arima_mod.get_forecast(steps=4)
+forecast_values=forecast.predicted_mean
+forecast_values=pd.DataFrame(forecast_values)
+# Forecast converges after 4 steps, entirely after 17 
+
+print(f'The forecast values:\n{df_test}')
+print(f'The actual values:\n{forecast_values}')
+
 #plt.subplot()
 plt.figure(4)
 plt.plot(df, label="data")
 plt.plot(arima_pred, label="predictions")
+plt.plot(forecast_values, label="forecast")
 plt.title("ARIMA(1,1,1) on from t=8.192 to t=138.144s on 04/01/22")
 plt.legend()
 plt.show()
+
+
 
