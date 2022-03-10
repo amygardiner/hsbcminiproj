@@ -16,7 +16,8 @@ import matplotlib.pyplot as plt
 
 
 # Assumed the file was downloaded from S3
-df1 = pd.read_csv('Tst2022-01-04tapes.csv',usecols=[2,3],nrows=250,names=['time','value'], header=0)
+df1 = pd.read_csv('Tst2022-01-04tapes.csv',usecols=[2,3],nrows=400,names=['time','value'], header=None)
+df1=df1.groupby('time').mean().reset_index()
 df=df1.value
 
 df_test = pd.read_csv('Tst2022-01-04tapes.csv',usecols=[3],skiprows=250,nrows=4,names=['value'], header=0)
@@ -108,6 +109,3 @@ plt.plot(forecast_values, label="forecast")
 plt.title("ARIMA(1,1,1) on from t=8.192 to t=138.144s on 04/01/22")
 plt.legend()
 plt.show()
-
-
-
