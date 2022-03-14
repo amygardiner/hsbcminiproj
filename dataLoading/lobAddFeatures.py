@@ -25,6 +25,7 @@ for inputFilename in inputFilenames:
 
     time = []
 
+    numOfBids = []
     bidAvg = []
     bidIqr = []
     bidBestPrice = []
@@ -32,6 +33,7 @@ for inputFilename in inputFilenames:
     bidQuantAvg = []
     bidQuantIqr = []
 
+    numOfAsks = []
     askAvg = []
     askIqr = []
     askBestPrice = []
@@ -57,6 +59,7 @@ for inputFilename in inputFilenames:
 
             time.append(prevTime)
             if len(bids) > 0:
+                numOfBids.append(len(bids))
                 bidPrices = bids[:,2].astype(float)
                 bidAvg.append(np.median(bidPrices))
                 bidQuartile1 = np.percentile(bidPrices, 25)
@@ -83,6 +86,7 @@ for inputFilename in inputFilenames:
                 
 
             if len(asks) > 0:
+                numOfAsks.append(len(asks))
                 askPrices = asks[:,2].astype(float)
                 askAvg.append(np.median(askPrices))
                 askQuartile1 = np.percentile(askPrices, 25)
@@ -111,7 +115,7 @@ for inputFilename in inputFilenames:
             QuotedSpread.append(askBestPrice[-1] - bidBestPrice[-1])
             MidPrice.append((askBestPrice[-1] + bidBestPrice[-1]) / 2)
             if (askQuantityAtBestPrice[-1] + bidQuantityAtBestPrice[-1]) > 0:
-                MicroPrice.append((askQuantityAtBestPrice[-1] * askBestPrice[-1] + bidQuantityAtBestPrice[-1] * bidBestPrice[-1]) / (askQuantityAtBestPrice[-1] + bidQuantityAtBestPrice[-1]))
+                MicroPrice.append(round((askQuantityAtBestPrice[-1] * askBestPrice[-1] + bidQuantityAtBestPrice[-1] * bidBestPrice[-1]) / (askQuantityAtBestPrice[-1] + bidQuantityAtBestPrice[-1]), 2))
             else:
                 MicroPrice.append(0)
 
@@ -124,7 +128,7 @@ for inputFilename in inputFilenames:
 
     df = pd.DataFrame({
         'time': time,
-        'MicroPrice': round(MicroPrice,2),
+        'MicroPrice': MicroPrice,
         'MidPrice': MidPrice,
         'QuotedSpread': QuotedSpread,
         'bidAvg': bidAvg,
@@ -133,11 +137,13 @@ for inputFilename in inputFilenames:
         'bidQuantityAtBestPrice': bidQuantityAtBestPrice,
         'bidQuantAvg': bidQuantAvg,
         'bidQuantIqr': bidQuantIqr,
+        'numberOfBids': numberOfBids,
         'askAvg': askAvg,
         'askIqr': askIqr,
         'askBestPrice': askBestPrice,
         'askQuantityAtBestPrice': askQuantityAtBestPrice,
         'askQuantAvg': askQuantAvg,
         'askQuantIqr': askQuantIqr,
+        'numberOfAsks': numberOfAsks,
     })
     df.to_csv(inputFilename + "Features.csv")
