@@ -12,7 +12,8 @@ import datetime
 from neuralprophet import NeuralProphet
 from matplotlib import pyplot as plt
 
-data_path = 'Tst2022-01-04tapes.csv'
+#data_path = 'Tst2022-01-04tapes.csv'
+data_path = '/Users/brookegrantham/Documents/Tst2022-01-04tapes.csv'
 
 raw_data = pd.read_csv(data_path, header=None, usecols=[2,3], na_filter=False, nrows=400, names=('Time','value'))
 raw_data.Time=round(raw_data.Time)
@@ -35,11 +36,29 @@ data2
 
 data2=data2.groupby('ds').mean().reset_index()
 # attempting the apply neural prophet to the data 
-clf = NeuralProphet(n_changepoints=15, n_lags=1, n_forecasts=1)
-model = clf.fit(data2)
+#clf = NeuralProphet(n_changepoints=15, n_lags=1, n_forecasts=1)
+#model = clf.fit(data2)
+
+#forecast = clf.predict(data2)
+#fig_forecast = clf.plot(forecast)
+#fig_components = clf.plot_components(forecast)
+#fig_model = clf.plot_parameters()
+
+# forecast prediction - n_lag confusion
+n_f=5
+clf = NeuralProphet(n_changepoints=15, n_lags=n_f*2, n_forecasts=n_f)
+model = clf.fit(data2, freq='S')
 
 forecast = clf.predict(data2)
-fig_forecast = clf.plot(forecast)
-fig_components = clf.plot_components(forecast)
-fig_model = clf.plot_parameters()
-
+future = clf.make_future_dataframe(data2)
+#full forecast
+#fig_forecast = clf.plot(forecast)
+future_forecast = clf.predict(future)
+plt.plot(future_forecast['ds'],future_forecast['yhat1'])
+plt.plot(future_forecast['ds'],future_forecast['yhat3'],'orange')
+plt.plot(future_forecast['ds'],future_forecast['yhat5'],'red')
+# plt.plot(forecast['ds'],forecast['yhat7'],'pink')
+# plt.plot(forecast['ds'],forecast['yhat9'],'purple')
+# plt.plot(forecast['ds'],forecast['yhat11'],'blue')
+plt.plot(forecast['ds'],forecast['y'], 'grey')
+plt.show()
