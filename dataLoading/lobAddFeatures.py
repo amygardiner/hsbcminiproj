@@ -75,6 +75,7 @@ for inputFilename in inputFilenames:
                 bidQuantQuartile3 = np.percentile(bidQuantities, 75)
                 bidQuantIqr.append(bidQuantQuartile3 - bidQuantQuartile1)
             else:
+                numOfBids.append(0)
                 bidAvg.append(0)
                 bidIqr.append(0)
                 bidBestPrice.append(0)
@@ -102,6 +103,7 @@ for inputFilename in inputFilenames:
                 askQuantQuartile3 = np.percentile(askQuantities, 75)
                 askQuantIqr.append(askQuantQuartile3 - askQuantQuartile1)
             else:
+                numOfAsks.append(0)
                 askAvg.append(0)
                 askIqr.append(0)
                 askBestPrice.append(0)
@@ -137,13 +139,13 @@ for inputFilename in inputFilenames:
         'bidQuantityAtBestPrice': bidQuantityAtBestPrice,
         'bidQuantAvg': bidQuantAvg,
         'bidQuantIqr': bidQuantIqr,
-        'numberOfBids': numberOfBids,
+        'numberOfBids': numOfBids,
         'askAvg': askAvg,
         'askIqr': askIqr,
         'askBestPrice': askBestPrice,
         'askQuantityAtBestPrice': askQuantityAtBestPrice,
         'askQuantAvg': askQuantAvg,
         'askQuantIqr': askQuantIqr,
-        'numberOfAsks': numberOfAsks,
+        'numberOfAsks': numOfAsks,
     })
     df.to_csv(inputFilename + "Features.csv")
