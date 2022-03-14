@@ -35,6 +35,7 @@ data2 = pd.DataFrame({'ds': raw_data.final_date, 'y':raw_data.value.astype(int)}
 data2
 
 data2=data2.groupby('ds').mean().reset_index()
+
 # attempting the apply neural prophet to the data 
 #clf = NeuralProphet(n_changepoints=15, n_lags=1, n_forecasts=1)
 #model = clf.fit(data2)
@@ -44,21 +45,20 @@ data2=data2.groupby('ds').mean().reset_index()
 #fig_components = clf.plot_components(forecast)
 #fig_model = clf.plot_parameters()
 
-# forecast prediction - n_lag confusion
-n_f=5
-clf = NeuralProphet(n_changepoints=15, n_lags=n_f*2, n_forecasts=n_f)
+# forecast prediction -short range
+clf = NeuralProphet(n_lags=1, n_forecasts=4)
 model = clf.fit(data2, freq='S')
-
 forecast = clf.predict(data2)
-future = clf.make_future_dataframe(data2)
-#full forecast
-#fig_forecast = clf.plot(forecast)
+future = clf.make_future_dataframe(data2, n_historic_predictions=True,periods=4)
 future_forecast = clf.predict(future)
-plt.plot(future_forecast['ds'],future_forecast['yhat1'])
-plt.plot(future_forecast['ds'],future_forecast['yhat3'],'orange')
-plt.plot(future_forecast['ds'],future_forecast['yhat5'],'red')
-# plt.plot(forecast['ds'],forecast['yhat7'],'pink')
-# plt.plot(forecast['ds'],forecast['yhat9'],'purple')
-# plt.plot(forecast['ds'],forecast['yhat11'],'blue')
-plt.plot(forecast['ds'],forecast['y'], 'grey')
+
+
+#full forecast
+plt.plot(future_forecast['ds'],future_forecast['y'],label='data')
+plt.plot(forecast['ds'],forecast['yhat1'], label='predictions')
+plt.plot(future_forecast['ds'].tail(5),future_forecast['yhat1'].tail(5), label='forecast')
+plt.title('NeuralProphet from t=8.192 to t=138.144 on 04/01/22')
+plt.xlabel('Time')
+plt.ylabel('Price')
+plt.legend()
 plt.show()
