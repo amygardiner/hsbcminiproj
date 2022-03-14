@@ -7,7 +7,8 @@ import math
 #inputFilename = "Tst2022-01-12LOBs"
 inputFilenames = [
     #"Tst2022-01-14LOBs", # at 8034.144 there are lines of 'M's which are clearly erroneous and causeing it to crash
-    "Tst2022-01-13LOBs",
+    #"Tst2022-02-04LOBs", # an error about 73% the way through the file
+    "Tst2022-02-07LOBs",
 ]
 
 for inputFilename in inputFilenames:
