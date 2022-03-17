@@ -20,7 +20,8 @@ df1 = pd.read_csv('Tst2022-01-04tapes.csv',usecols=[2,3],nrows=400,names=['time'
 df1=df1.groupby('time').mean().reset_index()
 df=df1.value
 
-df_test = pd.read_csv('Tst2022-01-04tapes.csv',usecols=[3],skiprows=250,nrows=4,names=['value'], header=0)
+# For comparing with future prediction
+df_test = pd.read_csv('Tst2022-01-04tapes.csv',usecols=[3],skiprows=399,nrows=4,names=['value'], header=None)
 
 # KPSS Test    
 result = kpss(df, regression='c', nlags="legacy")
