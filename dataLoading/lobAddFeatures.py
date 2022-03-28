@@ -1,24 +1,15 @@
 import csv
 import numpy as np
-import pandas as pd 
+import pandas as pd
+from tqdm import tqdm  # progress bars
 
 inputFilenames = [
-    #"Tst2022-01-14LOBs", # at 8034.144 there are lines of 'M's which are clearly erroneous and causeing it to crash
-    #"Tst2022-02-04LOBs", # an error about 73% the way through the file
-    "Tst2022-01-26LOBs",
+    "Tst2022-04-29LOBs",
 ]
 
 for inputFilename in inputFilenames:
 
-    fileLineCounter = open(inputFilename + ".csv", mode='r')
-    readerLineCounter = csv.reader(fileLineCounter)
-
-    #calculate number of lines
-    numLines = 0
-    for row in readerLineCounter:
-        numLines += 1
-    fileLineCounter.close()
-    print(numLines)
+    num_lines = sum(1 for line in open(inputFilename + ".csv",'r'))
 
     file = open(inputFilename + ".csv", mode='r')
     reader = csv.reader(file)
@@ -47,11 +38,11 @@ for inputFilename in inputFilenames:
 
     prevTime = ''
     entriesOfIntrest = []
-    for i, row in enumerate(reader):
+
+    filePrefix = "converting " + inputFilename
+    for i, row in enumerate(tqdm(reader, total=num_lines, colour='green', desc=filePrefix)):
         if i == 0:
             prevTime == row[0]
-        elif i % (round(numLines*0.01)) == 0:
-            print(round(i/numLines, 2), "complete, ", 50 - round(i/numLines, 2)*50, "minuites to go")
         
         if prevTime != row[0]:
             bids = np.array(list(filter(lambda row: row[1] == "bid", entriesOfIntrest)))
@@ -129,23 +120,23 @@ for inputFilename in inputFilenames:
     file.close()
 
     df = pd.DataFrame({
-        'time': time,
-        'MicroPrice': MicroPrice,
-        'MidPrice': MidPrice,
-        'QuotedSpread': QuotedSpread,
-        'bidAvg': bidAvg,
-        'bidIqr': bidIqr,
-        'bidBestPrice': bidBestPrice,
-        'bidQuantityAtBestPrice': bidQuantityAtBestPrice,
-        'bidQuantAvg': bidQuantAvg,
-        'bidQuantIqr': bidQuantIqr,
-        'numberOfBids': numOfBids,
-        'askAvg': askAvg,
-        'askIqr': askIqr,
-        'askBestPrice': askBestPrice,
-        'askQuantityAtBestPrice': askQuantityAtBestPrice,
-        'askQuantAvg': askQuantAvg,
-        'askQuantIqr': askQuantIqr,
-        'numberOfAsks': numOfAsks,
+        'time': time[1:],
+        'MicroPrice': MicroPrice[1:],
+        'MidPrice': MidPrice[1:],
+        'QuotedSpread': QuotedSpread[1:],
+        'bidAvg': bidAvg[1:],
+        'bidIqr': bidIqr[1:],
+        'bidBestPrice': bidBestPrice[1:],
+        'bidQuantityAtBestPrice': bidQuantityAtBestPrice[1:],
+        'bidQuantAvg': bidQuantAvg[1:],
+        'bidQuantIqr': bidQuantIqr[1:],
+        'numberOfBids': numOfBids[1:],
+        'askAvg': askAvg[1:],
+        'askIqr': askIqr[1:],
+        'askBestPrice': askBestPrice[1:],
+        'askQuantityAtBestPrice': askQuantityAtBestPrice[1:],
+        'askQuantAvg': askQuantAvg[1:],
+        'askQuantIqr': askQuantIqr[1:],
+        'numberOfAsks': numOfAsks[1:],
     })
     df.to_csv(inputFilename + "Features.csv")
