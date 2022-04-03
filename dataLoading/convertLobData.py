@@ -2,47 +2,34 @@ import io
 import csv
 import re
 import math
+from tqdm import tqdm  # progress bars
 
 #opens file
 #inputFilename = "Tst2022-01-12LOBs"
 inputFilenames = [
     #"Tst2022-01-14LOBs", # at 8034.144 there are lines of 'M's which are clearly erroneous and causeing it to crash
-    "Tst2022-01-13LOBs",
+    #"Tst2022-02-04LOBs", # an error about 73% the way through the file
+    #"Tst2022-03-07LOBs", # has no data at all
+    #"Tst2022-03-03LOBs", # fails 48% in: ValueError: invalid literal for int() with base 10: ''
+    #"Tst2022-01-28LOBs", # fails to start, undefined character
+    "Tst2022-01-31LOBs",
 ]
-
-for inputFilename in inputFilenames:
-
-    print("calculating number of lines")
-    with io.open(inputFilename + ".txt",'r') as lineCounter: #  encoding='utf-8'
-        for count, line in enumerate(lineCounter):
-            if count % 1566000 == 0:
-                print(count / 156600000, "complete")
-            pass
-    total_lines = count
-    lineCounter.close()
+def convertFile(inputFilename):
+    num_lines = sum(1 for line in open(inputFilename + ".txt",'r'))
 
     file = io.open(inputFilename + ".txt",'r', encoding='utf-8')
-
+    
     f = open(inputFilename + ".csv", 'w', newline='')
     writer = csv.writer(f)
-
-    computationTime = round((total_lines/156696422)*19.5, 2)
-    print("starting conversion of", total_lines, "lines")
-    print("this will take roughly", computationTime, "minuites")
-
-    percentageOfLines = math.floor(total_lines*0.01)
 
     prevState = "START"
     timeValue = 0.0
     transaction = ""
     transactionValue = 0
     transactionAmount = 0
-    for i in range(total_lines):
-        
-        if i % percentageOfLines == 0:
-            print(round(i / total_lines,2), "complete, roughly", round(computationTime - (round(i / total_lines,2)*computationTime), 2), "minuites left")
+    filePrefix = "converting " + inputFilename
+    for line in tqdm(file, total=num_lines, colour='green', desc=filePrefix):
 
-        line = file.readline()
         if re.search("[\w].*", line) != None:
             word = list(filter(lambda match: match != '' and match != ' ' and match != '\n', re.findall("\s?[\w\.]*",line)))[0]
             #removes speech marks and commas of time, bid and ask lines
@@ -91,3 +78,7 @@ for inputFilename in inputFilenames:
 
     f.close()
     file.close()
+
+
+for inputFilename in inputFilenames:
+    convertFile(inputFilename)
