@@ -13,6 +13,7 @@ from statsmodels.tsa.stattools import kpss
 from statsmodels.graphics.tsaplots import plot_acf,plot_pacf
 from statsmodels.tsa.arima.model import ARIMA
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
 
 # Assumed the file was downloaded from S3
 df1 = pd.read_csv('Tst2022-01-04tapes.csv',usecols=[2,3],nrows=400,names=['time','value'], header=None)
@@ -39,3 +40,5 @@ arima_pred=arima_mod.predict(start, end,
 # plot predictions and actual values
 arima_pred.plot(legend = True)
 df_test.plot(legend = True)
+
+print(mean_squared_error(df_test, arima_pred))
