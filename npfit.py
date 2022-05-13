@@ -54,11 +54,13 @@ future_forecast = clf.predict(future)
 
 
 #full forecast
+plt.figure(figsize=(12,6))
 plt.plot(future_forecast['ds'],future_forecast['y'],label='data')
 plt.plot(forecast['ds'],forecast['yhat1'], label='predictions')
 plt.plot(future_forecast['ds'].tail(5),future_forecast['yhat1'].tail(5), label='forecast')
 plt.title('NeuralProphet from t=8.192 to t=138.144 on 04/01/22')
 plt.xlabel('Time')
 plt.ylabel('Price')
+
 plt.legend()
 plt.show()
